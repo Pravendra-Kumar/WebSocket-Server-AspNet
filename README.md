@@ -31,11 +31,33 @@ A simple WebSocket server built with ASP.NET, enabling real-time communication b
 ```javascript
 const socket = new WebSocket("ws://localhost:<PORT>/ws");
 
-socket.onopen = function() {
-console.log("Connected to the server");
-socket.send("Hello Server");
-};
+socket.onopen = () => {
+      appendMessage("System", "✅ Connected to WebSocket server");
+    };
 
-socket.onmessage = function(event) {
-console.log("Received message: " + event.data);
-};
+    socket.onmessage = (event) => {
+      appendMessage("Other", event.data);
+    };
+
+    socket.onerror = (error) => {
+      appendMessage("System", "❌ WebSocket error");
+    };
+
+    socket.onclose = () => {
+      appendMessage("System", "🔌 Disconnected");
+    };
+
+    function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const message = input.value.trim();
+      if (!message) return;
+
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+        appendMessage("You", message);
+        input.value = "";
+      } else {
+        appendMessage("System", "❌ WebSocket is not open.");
+      }
+    }
+
